@@ -85,9 +85,10 @@ app.MapGet("/personasPaginadas", async (AppDbContext context, int? page, int? pa
     var pageNumber = (page.HasValue && page.Value > 0) ? page.Value : 1;
     var pageSizeNumber = (pageSize.HasValue && pageSize.Value > 0) ? pageSize.Value : 10;
 
-    var totalRecords = await context.Personas.CountAsync();
+    var totalRecords = await context.Personas.CountAsync( p => !p.Eliminado);
     var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSizeNumber);
     var personas = await context.Personas
+                                .Where(p => !p.Eliminado)
                                 .Skip((pageNumber - 1) * pageSizeNumber)
                                 .Take(pageSizeNumber)
                                 .ToListAsync();
